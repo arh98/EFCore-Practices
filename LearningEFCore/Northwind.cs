@@ -1,4 +1,5 @@
-﻿using Microsoft.EntityFrameworkCore;
+﻿using LearningEFCore.Entities;
+using Microsoft.EntityFrameworkCore;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -7,6 +8,8 @@ using System.Threading.Tasks;
 
 namespace LearningEFCore;
 public class NorthWind : DbContext {
+    public DbSet<Category>? Categories { get; set; }
+    public DbSet<Product>? Products { get; set; }
     protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder) {
         if (Constants.DatabaseProvider == "SQLite") {
             string path = Path.Combine(
@@ -21,6 +24,16 @@ public class NorthWind : DbContext {
             "MultipleActiveResultSets=true;";
             optionsBuilder.UseSqlServer(connection);
         }
+    }
+    protected override void OnModelCreating(ModelBuilder modelBuilder) {
+        modelBuilder.Entity<Category>()
+            .Property(c => c.CategoryName)
+            .IsRequired()
+            .HasMaxLength(20);
+        //"fix" the lack of decimal support in SQLite
+        modelBuilder.Entity<Product>()
+            .Property(p=>p.Cost)
+            .HasConversion<double>();
     }
 
 }
