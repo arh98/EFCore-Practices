@@ -1,7 +1,8 @@
 ﻿using LearningEFCore;
-using LearningEFCore.AutoGen;
 using Microsoft.EntityFrameworkCore;
-using Microsoft.EntityFrameworkCore.Query;
+using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Logging;
 
 Console.WriteLine($"Using {Constants.DatabaseProvider} database provider.");
 //QueringCategories();
@@ -10,6 +11,9 @@ QueringProducts();
 
 static void QueringCategories() {
     using (NorthWind db = new()) {
+
+        ILoggerFactory loggerFactory = db.GetService<ILoggerFactory>();
+        loggerFactory.AddProvider(new ConsoleLoggerProvider());
 
         Console.WriteLine("Categories & Number of Their Products : ");
         var categories = db.Categories?.Include(c => c.Products);
@@ -34,6 +38,7 @@ static void FilteredIncludes() {
         var categories = db.Categories?.Include(c => c.Products.Where(p => p.Stock >= stock));
 
         if (categories is not null) {
+            //Console.WriteLine($"ToQueryString: {categories.ToQueryString()}");
             foreach (var c in categories) {
                 Console.WriteLine($"{c.CategoryName} has {c.Products.Count} products with a minimum of { stock} units in stock.");
                 foreach (var p in c.Products) {
@@ -48,6 +53,10 @@ static void FilteredIncludes() {
 
 static void QueringProducts() {
     using (NorthWind db = new()) {
+
+        ILoggerFactory loggerFactory = db.GetService<ILoggerFactory>();
+        loggerFactory.AddProvider(new ConsoleLoggerProvider());
+
         Console.WriteLine("Products with that cost more that price , highest at top");
         string? input;
         decimal price;
