@@ -5,8 +5,8 @@ using Microsoft.EntityFrameworkCore.Query;
 
 Console.WriteLine($"Using {Constants.DatabaseProvider} database provider.");
 //QueringCategories();
-FilteredIncludes();
-
+//FilteredIncludes();
+QueringProducts();
 
 static void QueringCategories() {
     using (NorthWind db = new()) {
@@ -26,6 +26,7 @@ static void QueringCategories() {
 
 static void FilteredIncludes() {
     using (NorthWind db = new()) {
+
         Console.WriteLine("Minimum of Units in Stock ?");
         string unitInStock = Console.ReadLine() ?? "9";
         int stock = int.Parse(unitInStock);
@@ -43,6 +44,30 @@ static void FilteredIncludes() {
         }
         Console.WriteLine("No categories found.");
     }
+}
 
+static void QueringProducts() {
+    using (NorthWind db = new()) {
+        Console.WriteLine("Products with that cost more that price , highest at top");
+        string? input;
+        decimal price;
 
+        do {
+            Console.WriteLine("product price? ");
+            input = Console.ReadLine();
+        } while (!decimal.TryParse(input, out price));
+
+        var products = db.Products?
+            .Where(p => p.Cost > price)
+            .OrderByDescending(p => p.Cost);
+
+        if (products is not null) {
+            foreach (var p in products) {
+                Console.WriteLine("{0}: {1} costs {2:$#,##0.00} and has {3} in stock."
+                    , p.ProductId, p.ProductName, p.Cost, p.Stock);
+            }
+            return;
+        }
+        Console.WriteLine("No products found.");
+    }
 }
