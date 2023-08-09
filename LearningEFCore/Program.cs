@@ -3,15 +3,31 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
+using Microsoft.EntityFrameworkCore.ChangeTracking;
+using LearningEFCore.Entities;
 
 Console.WriteLine($"Using {Constants.DatabaseProvider} database provider.");
 
 //QueringCategories();
 //FilteredIncludes();
 //QueringProducts();
-QueringProductsWithLike();
+//QueringProductsWithLike();
+
+//if(addProduct(6, "Bob's Burgers", 500M)) {
+//   Console.WriteLine("Product Added Succesfull");
+//}
+
+//if (increasePrice("Bob", 20M)) {
+//   Console.WriteLine("Update product price successful.");
+//}
 
 
+//ListProducts();
+
+int deleted = deleteProducts( "Bob");
+Console.WriteLine($"{deleted} product(s) were deleted.");
+
+//Quering
 static void QueringCategories() {
     using (Northwind db = new()) {
 
@@ -56,6 +72,7 @@ static void FilteredIncludes() {
 
 static void QueringProducts() {
     using Northwind db = new();
+
     ILoggerFactory loggerFactory = db.GetService<ILoggerFactory>();
     loggerFactory.AddProvider(new ConsoleLoggerProvider());
 
@@ -84,6 +101,7 @@ static void QueringProducts() {
 
 static void QueringProductsWithLike() {
     using Northwind db = new();
+
     Console.WriteLine("A part of product name ?");
     string? input = Console.ReadLine();
 
@@ -96,5 +114,74 @@ static void QueringProductsWithLike() {
         return;
     }
     Console.WriteLine("No products found.");
+}
 
+static void ListProducts() {
+    using Northwind db = new();
+
+    var products = db.Products.OrderByDescending(p => p.Cost);
+
+    Console.WriteLine("{0,-3} {1,-35} {2,8} {3,5} {4}", "Id", "Product Name", "Cost", "Stock", "Disc.");
+    foreach (var p in products) {
+        Console.WriteLine("{0:000} {1,-35} {2,8:$#,##0.00} {3,5} {4}", p.ProductId, p.ProductName, p.Cost, p.Stock, p.Discontinued);
+
+    }
+}
+
+//inserting
+static bool addProduct(int categoryId, string name, decimal price) {
+    using Northwind db = new();
+
+    Product p = new() {
+        CategoryId = categoryId,
+        ProductName = name,
+        Cost = price
+    };
+    db.Products.Add(p);
+
+    int affected = db.SaveChanges();
+    return (affected == 1);
+}
+
+//updating
+static bool increasePrice(string nameStartWith, decimal amount) {
+    using Northwind db = new();
+
+    Product productToUpdate = db.Products.First(p => p.ProductName.StartsWith(nameStartWith));
+    productToUpdate.Cost += amount;
+
+    int affected = db.SaveChanges();
+    return (affected == 1);
+}
+
+//deleting
+static int deleteProducts(string nameStartWith) {
+    using Northwind db = new();
+
+    int affected = -1;
+    var productsToDelete = db.Products.Where(p => p.ProductName.StartsWith(nameStartWith));
+
+    if (productsToDelete is not null) {
+        db.Products.RemoveRange(productsToDelete);
+        affected = db.SaveChanges();
+        return affected;
+    }
+    Console.WriteLine("No products found to delete.");
+    return 0;
+}
+
+static bool deleteProduct(string name) {
+    using Northwind db = new();
+
+    var productToDelete = db.Products.First(p => p.ProductName == name);
+
+    if (productToDelete is not null) {
+        // Delete related records in Order Details table , remove() doesn't delete related records
+        //var orderDetailsToDelete = db.OrderDetails.Where(od => od.ProductID == productToDelete.ProductID);
+        //db.OrderDetails.RemoveRange(orderDetailsToDelete);
+
+        db.Products.Remove(productToDelete);
+        return  db.SaveChanges() == 1;
+    }
+    return false;
 }
