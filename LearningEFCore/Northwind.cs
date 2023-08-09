@@ -7,7 +7,7 @@ using System.Text;
 using System.Threading.Tasks;
 
 namespace LearningEFCore;
-public class NorthWind : DbContext {
+public class Northwind : DbContext {
     public DbSet<Category>? Categories { get; set; }
     public DbSet<Product>? Products { get; set; }
     protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder) {

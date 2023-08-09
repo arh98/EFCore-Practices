@@ -5,12 +5,15 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 
 Console.WriteLine($"Using {Constants.DatabaseProvider} database provider.");
+
 //QueringCategories();
 //FilteredIncludes();
-QueringProducts();
+//QueringProducts();
+QueringProductsWithLike();
+
 
 static void QueringCategories() {
-    using (NorthWind db = new()) {
+    using (Northwind db = new()) {
 
         ILoggerFactory loggerFactory = db.GetService<ILoggerFactory>();
         loggerFactory.AddProvider(new ConsoleLoggerProvider());
@@ -29,7 +32,7 @@ static void QueringCategories() {
 }
 
 static void FilteredIncludes() {
-    using (NorthWind db = new()) {
+    using (Northwind db = new()) {
 
         Console.WriteLine("Minimum of Units in Stock ?");
         string unitInStock = Console.ReadLine() ?? "9";
@@ -52,31 +55,46 @@ static void FilteredIncludes() {
 }
 
 static void QueringProducts() {
-    using (NorthWind db = new()) {
+    using Northwind db = new();
+    ILoggerFactory loggerFactory = db.GetService<ILoggerFactory>();
+    loggerFactory.AddProvider(new ConsoleLoggerProvider());
 
-        ILoggerFactory loggerFactory = db.GetService<ILoggerFactory>();
-        loggerFactory.AddProvider(new ConsoleLoggerProvider());
+    Console.WriteLine("Products with that cost more that price , highest at top");
+    string? input;
+    decimal price;
 
-        Console.WriteLine("Products with that cost more that price , highest at top");
-        string? input;
-        decimal price;
+    do {
+        Console.WriteLine("product price? ");
+        input = Console.ReadLine();
+    } while (!decimal.TryParse(input, out price));
 
-        do {
-            Console.WriteLine("product price? ");
-            input = Console.ReadLine();
-        } while (!decimal.TryParse(input, out price));
+    var products = db.Products?
+        .Where(p => p.Cost > price)
+        .OrderByDescending(p => p.Cost);
 
-        var products = db.Products?
-            .Where(p => p.Cost > price)
-            .OrderByDescending(p => p.Cost);
-
-        if (products is not null) {
-            foreach (var p in products) {
-                Console.WriteLine("{0}: {1} costs {2:$#,##0.00} and has {3} in stock."
-                    , p.ProductId, p.ProductName, p.Cost, p.Stock);
-            }
-            return;
+    if (products is not null) {
+        foreach (var p in products) {
+            Console.WriteLine("{0}: {1} costs {2:$#,##0.00} and has {3} in stock."
+                , p.ProductId, p.ProductName, p.Cost, p.Stock);
         }
-        Console.WriteLine("No products found.");
+        return;
     }
+    Console.WriteLine("No products found.");
+}
+
+static void QueringProductsWithLike() {
+    using Northwind db = new();
+    Console.WriteLine("A part of product name ?");
+    string? input = Console.ReadLine();
+
+    var products = db.Products.Where(p => EF.Functions.Like(p.ProductName, $"%{input}%"));
+
+    if (products is not null) {
+        foreach (var p in products) {
+            Console.WriteLine("{0} - {1} units in stock - Discontinued : {2}", p.ProductName, p.Stock, p.Discontinued);
+        }
+        return;
+    }
+    Console.WriteLine("No products found.");
+
 }
