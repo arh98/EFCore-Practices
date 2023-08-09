@@ -11,6 +11,7 @@ public class Northwind : DbContext {
     public DbSet<Category>? Categories { get; set; }
     public DbSet<Product>? Products { get; set; }
     protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder) {
+
         if (Constants.DatabaseProvider == "SQLite") {
             string path = Path.Combine(
             Environment.CurrentDirectory, "Northwind.db");
@@ -26,14 +27,19 @@ public class Northwind : DbContext {
         }
     }
     protected override void OnModelCreating(ModelBuilder modelBuilder) {
+
         modelBuilder.Entity<Category>()
             .Property(c => c.CategoryName)
             .IsRequired()
             .HasMaxLength(20);
+
         //"fix" the lack of decimal support in SQLite
         modelBuilder.Entity<Product>()
-            .Property(p=>p.Cost)
+            .Property(p => p.Cost)
             .HasConversion<double>();
+
+        modelBuilder.Entity<Product>()
+            .HasQueryFilter(p => !p.Discontinued);
     }
 
 }
