@@ -4,11 +4,11 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata;
 
 namespace LearningEFCore.AutoGen {
-    public partial class Northwind : DbContext {
-        public Northwind() {
+    public partial class Northwind2 : DbContext {
+        public Northwind2() {
         }
 
-        public Northwind(DbContextOptions<Northwind> options)
+        public Northwind2(DbContextOptions<Northwind> options)
             : base(options) {
         }
 
