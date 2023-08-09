@@ -25,6 +25,8 @@ public class Northwind : DbContext {
             "MultipleActiveResultSets=true;";
             optionsBuilder.UseSqlServer(connection);
         }
+
+        optionsBuilder.UseLazyLoadingProxies();
     }
     protected override void OnModelCreating(ModelBuilder modelBuilder) {
 
