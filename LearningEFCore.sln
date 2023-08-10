@@ -3,7 +3,9 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio Version 17
 VisualStudioVersion = 17.0.31919.166
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "LearningEFCore", "LearningEFCore\LearningEFCore.csproj", "{80C6AF4E-E6A7-4695-8DB0-31D3DD8BFC8D}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "DBFirst", "LearningEFCore\DBFirst.csproj", "{80C6AF4E-E6A7-4695-8DB0-31D3DD8BFC8D}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CodeFirst", "CodeFirst\CodeFirst.csproj", "{9743EF79-8610-428F-BDA3-BB71F4C5F13B}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -15,6 +17,10 @@ Global
 		{80C6AF4E-E6A7-4695-8DB0-31D3DD8BFC8D}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{80C6AF4E-E6A7-4695-8DB0-31D3DD8BFC8D}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{80C6AF4E-E6A7-4695-8DB0-31D3DD8BFC8D}.Release|Any CPU.Build.0 = Release|Any CPU
+		{9743EF79-8610-428F-BDA3-BB71F4C5F13B}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{9743EF79-8610-428F-BDA3-BB71F4C5F13B}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{9743EF79-8610-428F-BDA3-BB71F4C5F13B}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{9743EF79-8610-428F-BDA3-BB71F4C5F13B}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
