@@ -3,28 +3,29 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
+using Microsoft.EntityFrameworkCore.Storage;
 using Microsoft.EntityFrameworkCore.ChangeTracking;
 using LearningEFCore.Entities;
 
 Console.WriteLine($"Using {Constants.DatabaseProvider} database provider.");
 
-//QueringCategories();
-//FilteredIncludes();
-//QueringProducts();
-//QueringProductsWithLike();
+/*QueringCategories();
+FilteredIncludes();
+QueringProducts();
+QueringProductsWithLike();
 
-//if(addProduct(6, "Bob's Burgers", 500M)) {
-//   Console.WriteLine("Product Added Succesfull");
-//}
+if(addProduct(6, "Bob's Burgers", 500M)) {
+   Console.WriteLine("Product Added Succesfull");
+}
 
-//if (increasePrice("Bob", 20M)) {
-//   Console.WriteLine("Update product price successful.");
-//}
+if (increasePrice("Bob", 20M)) {
+   Console.WriteLine("Update product price successful.");
+}
 
 
-//ListProducts();
+ListProducts();*/
 
-int deleted = deleteProducts( "Bob");
+int deleted = deleteProducts("Bob");
 Console.WriteLine($"{deleted} product(s) were deleted.");
 
 //Quering
@@ -158,12 +159,18 @@ static bool increasePrice(string nameStartWith, decimal amount) {
 static int deleteProducts(string nameStartWith) {
     using Northwind db = new();
 
+    //define explicit transaction
+    using IDbContextTransaction t = db.Database.BeginTransaction();
+    Console.WriteLine("Transaction isolation level: {0}", arg0: t.GetDbTransaction().IsolationLevel);
+
+
     int affected = -1;
     var productsToDelete = db.Products.Where(p => p.ProductName.StartsWith(nameStartWith));
 
     if (productsToDelete is not null) {
         db.Products.RemoveRange(productsToDelete);
         affected = db.SaveChanges();
+        t.Commit();
         return affected;
     }
     Console.WriteLine("No products found to delete.");
@@ -181,7 +188,7 @@ static bool deleteProduct(string name) {
         //db.OrderDetails.RemoveRange(orderDetailsToDelete);
 
         db.Products.Remove(productToDelete);
-        return  db.SaveChanges() == 1;
+        return db.SaveChanges() == 1;
     }
     return false;
 }
